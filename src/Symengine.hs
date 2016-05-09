@@ -32,9 +32,9 @@ instance Storable BasicStruct where
     poke basic_ptr BasicStruct{..} = pokeByteOff basic_ptr 0 data_ptr
 
 
---|a smart pointer of a size 1 array of BasicStruct which has a finalizer attached
+-- |a smart pointer of a size 1 array of BasicStruct which has a finalizer attached
 type BasicExternal = ForeignPtr BasicStruct
--- !a raw pointer of size 1 of type `BasicStruct` which does not have a finalizer attached
+-- |a raw pointer of size 1 of type `BasicStruct` which does not have a finalizer attached
 type BasicInternal = Ptr BasicStruct
 
 -- |construct a 0
