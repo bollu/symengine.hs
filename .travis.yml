@@ -224,6 +224,7 @@ install_haskell:
 install_symengine:
 # Download and install symengine
 - |
+  set -ex
   export SYMENGINE_INSTALL_DIR=$HOME/symengine-install/
   mkdir -p $SYMENGINE_INSTALL_DIR
  
