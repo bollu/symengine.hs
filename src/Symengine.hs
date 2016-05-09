@@ -1,5 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 
+{-|
+Module      : Symengine
+Description : Symengine bindings to Haskell
+-}
 module Symengine
     (
      ascii_art_str,
@@ -28,18 +32,19 @@ instance Storable BasicStruct where
     poke basic_ptr BasicStruct{..} = pokeByteOff basic_ptr 0 data_ptr
 
 
+--|a smart pointer of a size 1 array of BasicStruct which has a finalizer attached
 type BasicExternal = ForeignPtr BasicStruct
--- !an array of size 1 of type `BasicStruct`
+-- !a raw pointer of size 1 of type `BasicStruct` which does not have a finalizer attached
 type BasicInternal = Ptr BasicStruct
--- exported functions
 
-
+-- |construct a 0
 basic_const_zero :: IO BasicExternal
 basic_const_zero = do
     basic <- create_basic
     withForeignPtr basic basic_const_zero_raw
     return basic
 
+-- |construct an empty string
 basic_str :: BasicExternal -> IO String
 basic_str basic_external = withForeignPtr basic_external (\p -> basic_str_raw p >>= peekCString)
 
