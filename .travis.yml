@@ -172,6 +172,29 @@ matrix:
   - env: BUILD=cabal GHCVER=head  CABALVER=head HAPPYVER=1.19.5 ALEXVER=3.1.7
   - env: BUILD=stack ARGS="--resolver nightly"
 
+
+install_symengine:
+# Download and install symengine
+- |
+  set -ex
+  export SYMENGINE_INSTALL_DIR=$HOME/symengine-install/
+  mkdir -p $SYMENGINE_INSTALL_DIR
+ 
+- cd $HOME && git clone https://github.com/symengine/symengine.git
+- cd $HOME/symengine && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR -DBUILD_TESTS=no . && make -j8 install && cd ../
+
+# export stuff and get out
+- |
+  export PATH=$PATH:$SYMENGINE_INSTALL_DIR/lib/
+  export CPATH=$CPATH:$SYMENGINE_INSTALL_DIR/include:$SYMENGINE_INSTALL_DIR/include/symengine/
+  export C_INCLUDE_PATH=$C_INCLUDE_PATH:$CPATH
+  export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$CPATH
+  export SYMENGINE_LIB_ARGS=--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/
+  export SYMENGINE_INCLUDE_ARGS=--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/
+  cd $TRAVIS_BUILD_DIR
+
+
+
 before_install:
 # Using compiler above sets CC to an invalid value, so unset it
 - unset CC
@@ -203,27 +226,6 @@ before_install:
 
 # Get the list of packages from the stack.yaml file
 - PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
-
-install_symengine:
-# Download and install symengine
-- |
-  set -ex
-  export SYMENGINE_INSTALL_DIR=$HOME/symengine-install/
-  mkdir -p $SYMENGINE_INSTALL_DIR
- 
-- cd $HOME && git clone https://github.com/symengine/symengine.git
-- cd $HOME/symengine && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR -DBUILD_TESTS=no . && make -j8 install && cd ../
-
-# export stuff and get out
-- |
-  export PATH=$PATH:$SYMENGINE_INSTALL_DIR/lib/
-  export CPATH=$CPATH:$SYMENGINE_INSTALL_DIR/include:$SYMENGINE_INSTALL_DIR/include/symengine/
-  export C_INCLUDE_PATH=$C_INCLUDE_PATH:$CPATH
-  export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$CPATH
-  export SYMENGINE_LIB_ARGS=--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/
-  export SYMENGINE_INCLUDE_ARGS=--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/
-  cd $TRAVIS_BUILD_DIR
-
 
 install_haskell:
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
