@@ -58,7 +58,8 @@ matrix:
                               binutils-dev,
                               g++-4.7,
                               gcc,
-                              cabal-install-1.18,ghc-7.8.4],
+                              cabal-install-1.18,
+                              ghc-7.8.4],
                   sources: [hvr-ghc, ubuntu-toolchain-r-test]}}
   - env: BUILD=cabal GHCVER=7.10.3 CABALVER=1.22
     addons: {apt: {packages: [libgmp-dev,
@@ -67,7 +68,8 @@ matrix:
                               binutils-dev,
                               g++-4.7,
                               gcc,
-                              cabal-install-1.22,ghc-7.10.3],
+                              cabal-install-1.22,
+                              ghc-7.10.3],
                   sources: [hvr-ghc, ubuntu-toolchain-r-test]}}
 
   # Build with the newest GHC and cabal-install. This is an accepted failure,
@@ -169,24 +171,23 @@ before_install:
 
 # Download and install symengine
 - |
-  export symengine_install_dir=$HOME/symengine-install/
-  mkdir -p symengine_install_dir
+  export SYMENGINE_INSTALL_DIR=$HOME/symengine-install/
+  mkdir -p $SYMENGINE_INSTALL_DIR
  
   cd $HOME && git clone https://github.com/symengine/symengine.git
-  cd $HOME/symengine && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$symengine_install_dir -DBUILD_TESTS=no . && make -j8 install && cd ../
+  cd $HOME/symengine && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR -DBUILD_TESTS=no . && make -j8 install && cd ../
 
 # export stuff and get out
 - |
-  export PATH=$PATH:$symengine_install_dir/lib/
-  export CPATH=$CPATH:$symengine_install_dir/include:$symengine_install_dir/include/symengine/
+  export PATH=$PATH:$SYMENGINE_INSTALL_DIR/lib/
+  export CPATH=$CPATH:$SYMENGINE_INSTALL_DIR/include:$SYMENGINE_INSTALL_DIR/include/symengine/
   export C_INCLUDE_PATH=$C_INCLUDE_PATH:$CPATH
   export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$CPATH
-  export SYMENGINE_LIB_ARGS=--extra-lib-dirs=$symengine_install_dir/lib/
-  export SYMENGINE_INCLUDE_ARGS=--extra-include-dirs=$symengine_install_dir/include/ --extra-include-dirs=$symengine_install_dir/include/symengine/
+  export SYMENGINE_LIB_ARGS=--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/
+  export SYMENGINE_INCLUDE_ARGS=--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/
   cd $TRAVIS_BUILD_DIR
 
 install:
-- echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
 - if [ -f configure.ac ]; then autoreconf -i; fi
 - |
   case "$BUILD" in
@@ -199,13 +200,15 @@ install:
       cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS  $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS
       ;;
   esac
+- echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
 
 script:
 - set -e
 - |
   case "$BUILD" in
     stack)
-      stack --no-terminal $ARGS $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS test --haddock --no-haddock-deps
+      stack --no-terminal $ARGS $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS test
+      stack --no-terminal $ARGS $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS haddock --no-haddock-deps
       ;;
     cabal)
       cabal configure --enable-tests --enable-benchmarks -v2 --ghc-options="-O0 -Werror" $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS
