@@ -180,7 +180,7 @@ before_install:
 # Download and install symengine
 - |
   set -ex
-  export SYMENGINE_INSTALL_DIR=$HOME/symengine-install/
+  export SYMENGINE_INSTALL_DIR=$HOME/symengine-install
   mkdir -p $SYMENGINE_INSTALL_DIR
  
 - cd $HOME && git clone https://github.com/symengine/symengine.git
