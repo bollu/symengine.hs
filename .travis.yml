@@ -234,7 +234,6 @@ install:
 # =====================
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
 - if [ -f configure.ac ]; then autoreconf -i; fi
-- cabal update
 - |
   set -ex
   case "$BUILD" in
