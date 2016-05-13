@@ -174,35 +174,30 @@ matrix:
 
 
 before_install:
-
 # SYMENGINE INSTALL PHASE
 # =======================
 # Download and install symengine
-- |
-  set -ex
-  export SYMENGINE_INSTALL_DIR=$HOME/symengine-install
-  mkdir -p $SYMENGINE_INSTALL_DIR
- 
+- set -ex
+- export SYMENGINE_INSTALL_DIR=$HOME/symengine-install
+- mkdir -p $SYMENGINE_INSTALL_DIR
 - cd $HOME && git clone https://github.com/symengine/symengine.git
 - export CC="gcc" && export CXX="g++-4.7" && export CMAKE_C_COMPILER=$CC && export CMAKE_CXX_COMPILER=$CXX
-- cd $HOME/symengine && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR -DBUILD_TESTS=no . && make -j8 install && cd ../
+- cd $HOME/symengine && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR -DBUILD_TESTS=no  -DBUILD_SHARED_LIBS:BOOL=ON . && make -j8 install && cd ../
 
 # export stuff and get out
-- |
-  export PATH="$PATH:$SYMENGINE_INSTALL_DIR/lib/"
-  export CPATH=$CPATH:"$SYMENGINE_INSTALL_DIR/include:$SYMENGINE_INSTALL_DIR/include/symengine/"
-  export C_INCLUDE_PATH="$C_INCLUDE_PATH:$CPATH"
-  export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:$CPATH"
-  export SYMENGINE_LIB_ARGS="--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/"
-  export SYMENGINE_INCLUDE_ARGS="--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/"
-  cd $TRAVIS_BUILD_DIR
+- export PATH="$PATH:$SYMENGINE_INSTALL_DIR/lib/"
+- export CPATH=$CPATH:"$SYMENGINE_INSTALL_DIR/include:$SYMENGINE_INSTALL_DIR/include/symengine/"
+- export C_INCLUDE_PATH="$C_INCLUDE_PATH:$CPATH"
+- export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:$CPATH"
+- export SYMENGINE_LIB_ARGS="--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/"
+- export SYMENGINE_INCLUDE_ARGS="--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/"
+- cd $TRAVIS_BUILD_DIR
 
 
 # GHC INSTALL PHASE
 # =================
 # Using compiler above sets CC to an invalid value, so unset it
-- unset CC
-
+#- unset CC
 # We want to always allow newer versions of packages when building on GHC HEAD
 - CABALARGS=""
 - if [ "x$GHCVER" = "xhead" ]; then CABALARGS=--allow-newer; fi
@@ -227,10 +222,8 @@ before_install:
   then
     echo 'jobs: $ncpus' >> $HOME/.cabal/config
   fi
-
 # Get the list of packages from the stack.yaml file
 - PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
-
 # PROJECT INSTALL PHASE
 # =====================
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
