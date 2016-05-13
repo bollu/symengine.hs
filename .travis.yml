@@ -173,7 +173,10 @@ matrix:
   - env: BUILD=stack ARGS="--resolver nightly"
 
 
-install_symengine:
+before_install:
+
+# SYMENGINE INSTALL PHASE
+# =======================
 # Download and install symengine
 - |
   set -ex
@@ -194,8 +197,8 @@ install_symengine:
   cd $TRAVIS_BUILD_DIR
 
 
-
-before_install:
+# GHC INSTALL PHASE
+# =================
 # Using compiler above sets CC to an invalid value, so unset it
 - unset CC
 
@@ -227,7 +230,8 @@ before_install:
 # Get the list of packages from the stack.yaml file
 - PACKAGES=$(stack --install-ghc query locals | grep '^ *path' | sed 's@^ *path:@@')
 
-install_haskell:
+# PROJECT INSTALL PHASE
+# =====================
 - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
 - if [ -f configure.ac ]; then autoreconf -i; fi
 - cabal update
