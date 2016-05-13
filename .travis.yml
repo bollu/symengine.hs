@@ -189,7 +189,7 @@ install:
     export CC="clang" && export CXX="clang" && export CMAKE_C_COMPILER=$CC && export CMAKE_CXX_COMPILER=$CXX
   else
     export CC="gcc" && export CXX="g++-4.7" && export CMAKE_C_COMPILER=$CC && export CMAKE_CXX_COMPILER=$CXX  
-  fi;
+  fi
   cd $HOME/symengine
   # cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR/ -DBUILD_TESTS=no  -DBUILD_SHARED_LIBS:BOOL=ON .
   cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR/ -DBUILD_TESTS=no  .
@@ -232,8 +232,6 @@ install:
     travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
   fi
   # Use the more reliable S3 mirror of Hackage
-
-- |
   mkdir -p $HOME/.cabal
   echo 'remote-repo: hackage.haskell.org:http://hackage.fpcomplete.com/' > $HOME/.cabal/config
   echo 'remote-repo-cache: $HOME/.cabal/packages' >> $HOME/.cabal/config
