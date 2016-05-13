@@ -184,7 +184,8 @@ install:
   cd $HOME && git clone https://github.com/symengine/symengine.git
   export CC="gcc" && export CXX="g++-4.7" && export CMAKE_C_COMPILER=$CC && export CMAKE_CXX_COMPILER=$CXX
   cd $HOME/symengine
-  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR -DBUILD_TESTS=no  -DBUILD_SHARED_LIBS:BOOL=ON .
+# cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR/ -DBUILD_TESTS=no  -DBUILD_SHARED_LIBS:BOOL=ON .
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$SYMENGINE_INSTALL_DIR/ -DBUILD_TESTS=no  .
   make
   make install
   echo "listing symengine install dir" && echo "======================"
@@ -197,8 +198,11 @@ install:
   export CPATH=$CPATH:"$SYMENGINE_INSTALL_DIR/include:$SYMENGINE_INSTALL_DIR/include/symengine/"
   export C_INCLUDE_PATH="$C_INCLUDE_PATH:$CPATH"
   export CPLUS_INCLUDE_PATH="$CPLUS_INCLUDE_PATH:$CPATH"
-  export SYMENGINE_LIB_ARGS="--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/"
+  export SYMENGINE_LIB_ARGS_STACK="--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/"
+  export SYMENGINE_LIB_ARGS_CABAL="--extra-lib-dirs=$SYMENGINE_INSTALL_DIR/lib/ --lib-dirs=$SYMENGINE_INSTALL_DIR/lib/"
+  
   export SYMENGINE_INCLUDE_ARGS="--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/"
+  export SYMENGINE_INCLUDE_ARGS_CABAL="--extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/ --extra-include-dirs=$SYMENGINE_INSTALL_DIR/include/symengine/ --include-dir=SYMENGINE_INSTALL_DIR/include/symengine/ --include=dir=$SYMENGINE_INSTALL_DIR/include/"
   cd $TRAVIS_BUILD_DIR
 
 
@@ -246,7 +250,7 @@ install:
     cabal)
       cabal --version
       travis_retry cabal update
-      cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS
+      cabal install --only-dependencies --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES $SYMENGINE_LIB_ARGS_CABAL $SYMENGINE_INCLUDE_ARGS
       ;;
   esac
   set +ex
@@ -257,17 +261,17 @@ script:
   set -ex
   case "$BUILD" in
     stack)
-      stack --no-terminal $ARGS $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS test --haddock --no-haddock-deps
+      stack --no-terminal $ARGS $SYMENGINE_LIB_ARGS_STACK $SYMENGINE_INCLUDE_ARGS test --haddock --no-haddock-deps
       ;;
     cabal)
       cabal update
-      cabal install --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS
+      cabal install --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES $SYMENGINE_LIB_ARGS_CABAL $SYMENGINE_INCLUDE_ARGS
 
       ORIGDIR=$(pwd)
       for dir in $PACKAGES
       do
         cd $dir
-        cabal check $SYMENGINE_LIB_ARGS $SYMENGINE_INCLUDE_ARGS || [ "$CABALVER" == "1.16" ]
+        cabal check || [ "$CABALVER" == "1.16" ]
         cabal sdist
         SRC_TGZ=$(cabal info . | awk '{print $2;exit}').tar.gz && \
           (cd dist && cabal install --force-reinstalls "$SRC_TGZ")
