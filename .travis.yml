@@ -101,7 +101,7 @@ matrix:
 
   # The Stack builds. We can pass in arbitrary Stack arguments via the ARGS
   # variable, such as using --stack-yaml to point to a different file.
-  - env: BUILD=stack ARGS=""
+  - env: BUILD=stack ARGS=" "
     compiler: ": #stack default"
     addons: {apt: {packages: [libgmp-dev,
                               libmpfr-dev,
@@ -148,7 +148,7 @@ matrix:
                               gcc, libgmp-dev]}}
 
   # Build on OS X in addition to Linux
-  - env: BUILD=stack ARGS=""
+  - env: BUILD=stack ARGS=" "
     compiler: ": #stack default osx"
     os: osx
 
