@@ -7,8 +7,11 @@ Description : Symengine bindings to Haskell
 module Symengine
     (
      ascii_art_str,
+     ascii_art_str_raw,
      basic_str,
+     basic_str_raw,
      basic_const_zero,
+     basic_const_zero_raw,
      BasicExternal,
     ) where
 
@@ -72,6 +75,5 @@ foreign import ccall "symengine/cwrapper.h basic_new_heap" basic_new_heap_raw ::
 foreign import ccall "symengine/cwrapper.h &basic_free_heap" ptr_basic_free_heap_raw :: FunPtr(BasicInternal -> IO ())
 
 
-foreign import ccall "symengine/cwrapper.h basic_const_zero" basic_const_zero_raw :: BasicInternal -> IO ()
-
+foreign import ccall "/cwrapper.h basic_const_zero" basic_const_zero_raw :: BasicInternal -> IO ()
 foreign import ccall "symengine/cwrapper.h basic_str" basic_str_raw :: BasicInternal -> IO CString
