@@ -279,8 +279,8 @@ script:
       cabal update
       cabal configure $SYMENGINE_LIB_ARGS_CABAL $SYMENGINE_INCLUDE_ARGS
       cabal build
-      # just build for now, forget test
-      # cabal install --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES $SYMENGINE_LIB_ARGS_CABAL $SYMENGINE_INCLUDE_ARGS
+      # install after building the library
+      cabal install --enable-tests --enable-benchmarks --force-reinstalls --ghc-options=-O0 --reorder-goals --max-backjumps=-1 $CABALARGS $PACKAGES $SYMENGINE_LIB_ARGS_CABAL $SYMENGINE_INCLUDE_ARGS
 
       ORIGDIR=$(pwd)
       for dir in $PACKAGES
