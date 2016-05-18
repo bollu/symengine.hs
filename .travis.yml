@@ -12,7 +12,6 @@ ratings:
   paths:
   - "**.hs"
 
-
 # Choose a lightweight base image; we provide our own build tools.
 language: c
 
